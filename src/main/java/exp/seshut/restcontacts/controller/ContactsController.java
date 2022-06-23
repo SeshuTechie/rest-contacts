@@ -1,6 +1,6 @@
 package exp.seshut.restcontacts.controller;
 
-import exp.seshut.restcontacts.Contact;
+import exp.seshut.restcontacts.model.Contact;
 import exp.seshut.restcontacts.service.ContactsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +12,7 @@ public class ContactsController {
     private ContactsService contactService;
 
     @GetMapping("/contact/{id}")
-    public Contact getMapping(@PathVariable long id) {
+    public Contact getMapping(@PathVariable String id) {
         return contactService.getContact(id);
     }
 
@@ -27,7 +27,7 @@ public class ContactsController {
     }
 
     @DeleteMapping("/contact/{id}")
-    public Contact deleteMapping(@PathVariable long id) {
+    public Contact deleteMapping(@PathVariable String id) {
         return contactService.deleteContact(id);
     }
 }

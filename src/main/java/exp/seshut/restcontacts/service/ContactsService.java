@@ -1,46 +1,52 @@
 package exp.seshut.restcontacts.service;
 
-import exp.seshut.restcontacts.Contact;
+import exp.seshut.restcontacts.model.Contact;
 import exp.seshut.restcontacts.exception.ContactNotFoundException;
+import exp.seshut.restcontacts.repository.ContactRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class ContactsService {
 
-    //Storing contacts in cache for demo purpose
-    private Map<Long, Contact> contactMap = new HashMap<>();
+    @Autowired
+    private ContactRepo contactRepo;
     private AtomicLong counter = new AtomicLong();
 
-    public Contact getContact(long id) {
-        if(!contactMap.containsKey(id)) {
+    public Contact getContact(String id) {
+        try {
+            return contactRepo.findById(id).orElseThrow();
+        } catch (NoSuchElementException ex) {
             throw new ContactNotFoundException(id);
         }
-        return contactMap.get(id);
     }
 
     public Contact saveContact(Contact contact) {
-        long id = counter.incrementAndGet();
-        contact.setId(id);
-        contactMap.put(id, contact);
-        return contact;
+//        long id = counter.incrementAndGet();
+//        contact.setId(id);
+        return contactRepo.save(contact);
     }
 
     public Contact updateContact(Contact contact) {
-        if(!contactMap.containsKey(contact.getId())) {
+        try {
+            contactRepo.findById(contact.getId()).orElseThrow();
+        } catch (NoSuchElementException ex) {
             throw new ContactNotFoundException(contact.getId());
         }
-        contactMap.put(contact.getId(), contact);
-        return contact;
+        return contactRepo.save(contact);
     }
 
-    public Contact deleteContact(long id) {
-        if(!contactMap.containsKey(id)) {
-            throw new ContactNotFoundException(id);
+    public Contact deleteContact(String id) {
+        Contact contact = null;
+        try {
+            contact = contactRepo.findById(id).orElseThrow();
+        } catch (NoSuchElementException ex) {
+            throw new ContactNotFoundException(contact.getId());
         }
-        return contactMap.remove(id);
+        contactRepo.deleteById(id);
+        return contact;
     }
 }
